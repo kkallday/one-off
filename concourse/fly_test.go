@@ -33,7 +33,7 @@ var _ = Describe("fly", func() {
 			It("returns an error containing stderr when fly exits with a non-zero exit code", func() {
 				fly = concourse.NewFly(pathToFakeErroredFly)
 				_, err := fly.GetPipeline("", "")
-				Expect(err).To(MatchError("exit status 1, stderr: some error message"))
+				Expect(err).To(MatchError("exit status 1\nstderr from fly: some error message"))
 			})
 		})
 	})

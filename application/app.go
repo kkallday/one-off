@@ -47,7 +47,6 @@ func (App) parseArgs(args []string) (OneOffInputs, error) {
 	flags.StringVar(&oneOffInputs.Pipeline, "p", "", "name of pipeline")
 	flags.StringVar(&oneOffInputs.Job, "j", "", "name of job")
 	flags.StringVar(&oneOffInputs.Task, "t", "", "name of task")
-	flags.StringVar(&oneOffInputs.OutputDir, "out", "", "(optional) directory to write one off script")
 	err := flags.Parse(args)
 	if err != nil {
 		return OneOffInputs{}, err

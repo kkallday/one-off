@@ -2,14 +2,13 @@ package application
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
+	"io"
 )
 
 type OneOff struct {
 	fly               fly
 	pipelineConverter pipelineConverter
+	writer            io.Writer
 }
 
 type fly interface {
@@ -20,10 +19,11 @@ type pipelineConverter interface {
 	EnvVars(pipeline, job, task string) (string, error)
 }
 
-func NewOneOff(fly fly, pipelineConverter pipelineConverter) OneOff {
+func NewOneOff(fly fly, pipelineConverter pipelineConverter, writer io.Writer) OneOff {
 	return OneOff{
 		fly:               fly,
 		pipelineConverter: pipelineConverter,
+		writer:            writer,
 	}
 }
 
@@ -44,14 +44,9 @@ func (o OneOff) Run(inputs OneOffInputs) error {
 fly -t %s execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from %s/%s`,
 		envVars, inputs.TargetAlias, inputs.Pipeline, inputs.Job)
 
-	var dir string
-	if inputs.OutputDir != "" {
-		dir = inputs.OutputDir
-	}
-
-	err = ioutil.WriteFile(filepath.Join(dir, fmt.Sprintf("%s-one-off", inputs.Task)), []byte(script), os.ModePerm)
+	_, err = o.writer.Write([]byte(script))
 	if err != nil {
-		return fmt.Errorf("failed to write script: %v", err)
+		return fmt.Errorf("failed to write one-off to stdout: %v", err)
 	}
 
 	return nil

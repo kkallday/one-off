@@ -1,9 +1,8 @@
 package application_test
 
 import (
+	"bytes"
 	"errors"
-	"io/ioutil"
-	"path/filepath"
 
 	"github.com/kkallday/one-off/application"
 	"github.com/kkallday/one-off/fakes"
@@ -12,10 +11,17 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+type ErrBuffer struct{}
+
+func (*ErrBuffer) Write(_ []byte) (int, error) {
+	return -1, errors.New("failed to write")
+}
+
 var _ = Describe("one off", func() {
 	var (
 		fakeFly               *fakes.Fly
 		fakePipelineConverter *fakes.PipelineConverter
+		stdout                *bytes.Buffer
 
 		oneOff application.OneOff
 	)
@@ -23,7 +29,8 @@ var _ = Describe("one off", func() {
 	BeforeEach(func() {
 		fakeFly = &fakes.Fly{}
 		fakePipelineConverter = &fakes.PipelineConverter{}
-		oneOff = application.NewOneOff(fakeFly, fakePipelineConverter)
+		stdout = &bytes.Buffer{}
+		oneOff = application.NewOneOff(fakeFly, fakePipelineConverter, stdout)
 	})
 
 	It("gets pipeline using fly", func() {
@@ -56,23 +63,16 @@ var _ = Describe("one off", func() {
 		Expect(fakePipelineConverter.EnvVarsCall.Receives.Task).To(Equal("some-task"))
 	})
 
-	It("writes env vars and fly script to a file", func() {
+	It("writes script to stdout", func() {
 		fakePipelineConverter.EnvVarsCall.Returns.EnvVars = `export VAR1="foo"
 export VAR2="bar"
 export VAR3="something else"`
-		tempDir, err := ioutil.TempDir("", "")
-		Expect(err).NotTo(HaveOccurred())
-
-		err = oneOff.Run(application.OneOffInputs{
+		err := oneOff.Run(application.OneOffInputs{
 			TargetAlias: "some-target-alias",
 			Pipeline:    "some-pipeline",
 			Job:         "some-job",
 			Task:        "some-task",
-			OutputDir:   tempDir,
 		})
-		Expect(err).NotTo(HaveOccurred())
-
-		actualScript, err := ioutil.ReadFile(filepath.Join(tempDir, "some-task-one-off"))
 		Expect(err).NotTo(HaveOccurred())
 
 		expectedScript := `#!/bin/bash -exu
@@ -82,7 +82,7 @@ export VAR3="something else"
 
 fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from some-pipeline/some-job`
 
-		Expect(string(actualScript)).To(Equal(string(expectedScript)))
+		Expect(string(stdout.Bytes())).To(Equal(string(expectedScript)))
 	})
 
 	Context("failure cases", func() {
@@ -98,11 +98,11 @@ fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from 
 			Expect(err).To(MatchError("failed to retrieve pipeline params from pipeline: failed to convert pipeline"))
 		})
 
-		It("returns an error when script file cannot be written", func() {
-			err := oneOff.Run(application.OneOffInputs{
-				OutputDir: "/some/non/existent/dir",
-			})
-			Expect(err).To(MatchError("failed to write script: open /some/non/existent/dir/-one-off: no such file or directory"))
+		It("returns an error when script cannot be written to stdout", func() {
+			errStdout := &ErrBuffer{}
+			oneOff = application.NewOneOff(fakeFly, fakePipelineConverter, errStdout)
+			err := oneOff.Run(application.OneOffInputs{})
+			Expect(err).To(MatchError("failed to write one-off to stdout: failed to write"))
 		})
 	})
 })

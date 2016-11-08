@@ -5,5 +5,4 @@ type OneOffInputs struct {
 	Pipeline    string
 	Job         string
 	Task        string
-	OutputDir   string
 }
