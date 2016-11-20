@@ -45,6 +45,11 @@ export VAR3="value3"`))
 		})
 
 		Context("failure cases", func() {
+			It("returns an error when jobs array in pipeline is empty", func() {
+				_, err := pc.EnvVars("jobs: []", "some-job", "some-task")
+				Expect(err).To(MatchError("pipeline does not contain any jobs - are you sure the pipeline exists?"))
+			})
+
 			It("returns error when the given job is not found in the pipeline", func() {
 				_, err := pc.EnvVars(pipelineYAML, "unknown-job", "some-task")
 				Expect(err).To(MatchError(`could not find job "unknown-job" in pipeline`))

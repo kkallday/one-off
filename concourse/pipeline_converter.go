@@ -1,6 +1,7 @@
 package concourse
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -37,6 +38,10 @@ func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (stri
 	err := yaml.Unmarshal([]byte(pipelineYAML), &pipeline)
 	if err != nil {
 		return "", err
+	}
+
+	if len(pipeline.Jobs) == 0 {
+		return "", errors.New("pipeline does not contain any jobs - are you sure the pipeline exists?")
 	}
 
 	job, err := p.findJob(pipeline, jobName)
