@@ -26,11 +26,7 @@ type Job struct {
 
 type Plan struct {
 	Task   string
-	Config Config
-}
-
-type Config struct {
-	Params map[string]string
+  Params map[string]string
 }
 
 func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (string, error) {
@@ -55,7 +51,7 @@ func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (stri
 	}
 
 	var envVars []string
-	for k, v := range task.Config.Params {
+	for k, v := range task.Params {
 		envVars = append(envVars, fmt.Sprintf("export %s=%q", k, v))
 	}
 

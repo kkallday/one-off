@@ -22,11 +22,10 @@ jobs:
     - get: some-resource
   - task: some-task
     file: /path/to/task.yml
-    config:
-      params:
-        VAR1: value1
-        VAR2: value2
-        VAR3: value3`
+    params:
+      VAR1: value1
+      VAR2: value2
+      VAR3: value3`
 
 var _ = Describe("pipeline converter", func() {
 	var pc concourse.PipelineConverter
