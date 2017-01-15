@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"path/filepath"
 )
 
 type OneOff struct {
@@ -32,14 +33,17 @@ func NewOneOff(fly fly, pipelineConverter pipelineConverter, writer io.Writer) O
 }
 
 func (o OneOff) Run(inputs OneOffInputs) error {
+	var nameOfFlyCLI string
 	if inputs.FlyOverride != "" {
 		o.fly.SetPathToFly(inputs.FlyOverride)
+		nameOfFlyCLI = filepath.Base(inputs.FlyOverride)
 	} else {
 		pathToFly, err := lookPath("fly")
 		if err != nil {
 			panic(err)
 		}
 		o.fly.SetPathToFly(pathToFly)
+		nameOfFlyCLI = "fly"
 	}
 
 	pipelineYAML, err := o.fly.GetPipeline(inputs.TargetAlias, inputs.Pipeline)
@@ -55,8 +59,8 @@ func (o OneOff) Run(inputs OneOffInputs) error {
 	script := fmt.Sprintf(`#!/bin/bash -exu
 %s
 
-fly -t %s execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from %s/%s`,
-		envVars, inputs.TargetAlias, inputs.Pipeline, inputs.Job)
+%s -t %s execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from %s/%s`,
+		envVars, nameOfFlyCLI, inputs.TargetAlias, inputs.Pipeline, inputs.Job)
 
 	_, err = o.writer.Write([]byte(script))
 	if err != nil {

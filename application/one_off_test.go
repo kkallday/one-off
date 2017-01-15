@@ -57,6 +57,26 @@ var _ = Describe("one off", func() {
 			Expect(fakeFly.SetPathToFlyCall.CallCount).To(Equal(1))
 			Expect(fakeFly.SetPathToFlyCall.Receives.PathToFly).To(Equal("/some/path/to/fly"))
 		})
+
+		It("writes script to stdout with name of program fly override points to", func() {
+			fakePipelineConverter.EnvVarsCall.Returns.EnvVars = `export VAR1="foo"`
+
+			err := oneOff.Run(application.OneOffInputs{
+				TargetAlias: "some-target-alias",
+				Pipeline:    "some-pipeline",
+				Job:         "some-job",
+				Task:        "some-task",
+				FlyOverride: "/some/path/to/custom-fly-cli-program",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedScript := `#!/bin/bash -exu
+export VAR1="foo"
+
+custom-fly-cli-program -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from some-pipeline/some-job`
+
+			Expect(string(stdout.Bytes())).To(Equal(string(expectedScript)))
+		})
 	})
 
 	It("gets pipeline using fly", func() {
