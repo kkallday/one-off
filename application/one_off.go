@@ -59,7 +59,8 @@ func (o OneOff) Run(inputs OneOffInputs) error {
 	script := fmt.Sprintf(`#!/bin/bash -exu
 %s
 
-%s -t %s execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from %s/%s`,
+%s -t %s execute --config=REPLACE/ME/PATH/TO/TASK \
+		--inputs-from %s/%s`,
 		envVars, nameOfFlyCLI, inputs.TargetAlias, inputs.Pipeline, inputs.Job)
 
 	_, err = o.writer.Write([]byte(script))

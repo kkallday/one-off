@@ -73,7 +73,8 @@ var _ = Describe("one off", func() {
 			expectedScript := `#!/bin/bash -exu
 export VAR1="foo"
 
-custom-fly-cli-program -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from some-pipeline/some-job`
+custom-fly-cli-program -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK \
+		--inputs-from some-pipeline/some-job`
 
 			Expect(string(stdout.Bytes())).To(Equal(string(expectedScript)))
 		})
@@ -126,7 +127,8 @@ export VAR1="foo"
 export VAR2="bar"
 export VAR3="something else"
 
-fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK --inputs-from some-pipeline/some-job`
+fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK \
+		--inputs-from some-pipeline/some-job`
 
 		Expect(string(stdout.Bytes())).To(Equal(string(expectedScript)))
 	})
