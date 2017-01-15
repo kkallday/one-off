@@ -17,7 +17,7 @@ func main() {
 
 	fly := concourse.NewFly(pathToFly)
 	pipelineConverter := concourse.NewPipelineConverter()
-	oneOff := application.NewOneOff(fly, pipelineConverter, os.Stdout)
+	oneOff := application.NewOneOff(&fly, pipelineConverter, os.Stdout)
 
 	app := application.New(oneOff)
 	err = app.Execute(os.Args[1:])

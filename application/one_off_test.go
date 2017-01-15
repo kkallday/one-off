@@ -33,6 +33,32 @@ var _ = Describe("one off", func() {
 		oneOff = application.NewOneOff(fakeFly, fakePipelineConverter, stdout)
 	})
 
+	AfterEach(func() {
+		application.ResetLookPath()
+	})
+
+	It("gets path to fly cli from $PATH", func() {
+		application.SetLookPath(func(_ string) (string, error) {
+			return "/home/user/bin/fly-cli", nil
+		})
+
+		err := oneOff.Run(application.OneOffInputs{})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(fakeFly.SetPathToFlyCall.CallCount).To(Equal(1))
+		Expect(fakeFly.SetPathToFlyCall.Receives.PathToFly).To(Equal("/home/user/bin/fly-cli"))
+	})
+
+	Context("when fly override is supplied", func() {
+		It("sets the path to fly", func() {
+			err := oneOff.Run(application.OneOffInputs{
+				FlyOverride: "/some/path/to/fly",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fakeFly.SetPathToFlyCall.CallCount).To(Equal(1))
+			Expect(fakeFly.SetPathToFlyCall.Receives.PathToFly).To(Equal("/some/path/to/fly"))
+		})
+	})
+
 	It("gets pipeline using fly", func() {
 		err := oneOff.Run(application.OneOffInputs{
 			TargetAlias: "some-target-alias",

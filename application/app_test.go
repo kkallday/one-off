@@ -29,6 +29,7 @@ var _ = Describe("app", func() {
 			"-p", "some-pipeline",
 			"-j", "some-job",
 			"-t", "some-task",
+			"-fo", "/path/to/fly",
 		})
 		Expect(err).NotTo(HaveOccurred())
 
@@ -38,6 +39,7 @@ var _ = Describe("app", func() {
 			Pipeline:    "some-pipeline",
 			Job:         "some-job",
 			Task:        "some-task",
+			FlyOverride: "/path/to/fly",
 		}))
 	})
 

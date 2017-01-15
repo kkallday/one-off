@@ -37,3 +37,7 @@ func (f Fly) GetPipeline(targetAlias, pipeline string) (string, error) {
 
 	return string(stdout.Bytes()), nil
 }
+
+func (f *Fly) SetPathToFly(pathToFly string) {
+	f.pathToFly = pathToFly
+}

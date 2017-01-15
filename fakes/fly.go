@@ -12,6 +12,12 @@ type Fly struct {
 			Error        error
 		}
 	}
+	SetPathToFlyCall struct {
+		CallCount int
+		Receives  struct {
+			PathToFly string
+		}
+	}
 }
 
 func (f *Fly) GetPipeline(targetAlias string, pipeline string) (string, error) {
@@ -19,4 +25,9 @@ func (f *Fly) GetPipeline(targetAlias string, pipeline string) (string, error) {
 	f.GetPipelineCall.Receives.TargetAlias = targetAlias
 	f.GetPipelineCall.Receives.Pipeline = pipeline
 	return f.GetPipelineCall.Returns.PipelineYAML, f.GetPipelineCall.Returns.Error
+}
+
+func (f *Fly) SetPathToFly(pathToFly string) {
+	f.SetPathToFlyCall.CallCount++
+	f.SetPathToFlyCall.Receives.PathToFly = pathToFly
 }

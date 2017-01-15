@@ -47,6 +47,7 @@ func (App) parseArgs(args []string) (OneOffInputs, error) {
 	flags.StringVar(&oneOffInputs.Pipeline, "p", "", "name of pipeline")
 	flags.StringVar(&oneOffInputs.Job, "j", "", "name of job")
 	flags.StringVar(&oneOffInputs.Task, "t", "", "name of task")
+	flags.StringVar(&oneOffInputs.FlyOverride, "fo", "", `(optional) override path to fly. one-off uses "fly" in $PATH by default`)
 	err := flags.Parse(args)
 	if err != nil {
 		return OneOffInputs{}, err

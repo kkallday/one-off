@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"io"
+	"os/exec"
 )
 
 type OneOff struct {
@@ -13,11 +14,14 @@ type OneOff struct {
 
 type fly interface {
 	GetPipeline(targetAlias, pipeline string) (string, error)
+	SetPathToFly(pathToFly string)
 }
 
 type pipelineConverter interface {
 	EnvVars(pipeline, job, task string) (string, error)
 }
+
+var lookPath = exec.LookPath
 
 func NewOneOff(fly fly, pipelineConverter pipelineConverter, writer io.Writer) OneOff {
 	return OneOff{
@@ -28,6 +32,16 @@ func NewOneOff(fly fly, pipelineConverter pipelineConverter, writer io.Writer) O
 }
 
 func (o OneOff) Run(inputs OneOffInputs) error {
+	if inputs.FlyOverride != "" {
+		o.fly.SetPathToFly(inputs.FlyOverride)
+	} else {
+		pathToFly, err := lookPath("fly")
+		if err != nil {
+			panic(err)
+		}
+		o.fly.SetPathToFly(pathToFly)
+	}
+
 	pipelineYAML, err := o.fly.GetPipeline(inputs.TargetAlias, inputs.Pipeline)
 	if err != nil {
 		return fmt.Errorf("failed to get pipeline: %v", err)
