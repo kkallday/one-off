@@ -40,8 +40,9 @@ func (o OneOff) Run(inputs OneOffInputs) error {
 	} else {
 		pathToFly, err := lookPath("fly")
 		if err != nil {
-			panic(err)
+			return err
 		}
+
 		o.fly.SetPathToFly(pathToFly)
 		nameOfFlyCLI = "fly"
 	}

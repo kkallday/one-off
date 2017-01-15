@@ -152,5 +152,13 @@ fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK \
 			err := oneOff.Run(application.OneOffInputs{})
 			Expect(err).To(MatchError("failed to write one-off to stdout: failed to write"))
 		})
+
+		It("returns an error when look up for fly in $PATH fails", func() {
+			application.SetLookPath(func(_ string) (string, error) {
+				return "", errors.New("look path failed")
+			})
+			err := oneOff.Run(application.OneOffInputs{})
+			Expect(err).To(MatchError("look path failed"))
+		})
 	})
 })
