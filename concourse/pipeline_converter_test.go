@@ -25,9 +25,11 @@ jobs:
     file: /path/to/task.yml
     config:
       params:
-       VAR1OLD: value1old
-       VAR2OLD: value2old
-       VAR3OLD: value3old`
+        random-non-param:
+        - something-non-param
+        VAR1OLD: value1old
+        VAR2OLD: value2old
+        VAR3OLD: value3old`
 	modernPipelineYAML = `---
 groups:
 - name: some-pipeline-name
@@ -44,6 +46,8 @@ jobs:
   - task: some-task
     file: /path/to/task.yml
     params:
+      random-non-param:
+      - something-non-param
       VAR1: value1
       VAR2: value2
       VAR3: value3`

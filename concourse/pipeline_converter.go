@@ -26,12 +26,12 @@ type Job struct {
 
 type Plan struct {
 	Task   string
-	Params map[string]string
+	Params map[string]interface{}
 	Config *Config
 }
 
 type Config struct {
-	Params map[string]string
+	Params map[string]interface{}
 }
 
 func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (string, error) {
@@ -55,7 +55,7 @@ func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (stri
 		return "", err
 	}
 
-	var params map[string]string
+	var params map[string]interface{}
 	if task.Config != nil {
 		params = task.Config.Params
 	} else {
@@ -64,7 +64,11 @@ func (p PipelineConverter) EnvVars(pipelineYAML, jobName, taskName string) (stri
 
 	var envVars []string
 	for k, v := range params {
-		envVars = append(envVars, fmt.Sprintf("export %s=%q", k, v))
+		var ok bool
+		v, ok = v.(string)
+		if ok {
+			envVars = append(envVars, fmt.Sprintf("export %s=%q", k, v))
+		}
 	}
 	sort.Strings(envVars)
 
