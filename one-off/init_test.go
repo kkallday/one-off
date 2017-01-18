@@ -14,11 +14,17 @@ func TestOneOff(t *testing.T) {
 	RunSpecs(t, "one-off")
 }
 
-var pathToOneOff string
+var (
+	pathToOneOff  string
+	pathToFakeFly string
+)
 
 var _ = BeforeSuite(func() {
 	var err error
 	pathToOneOff, err = gexec.Build("github.com/kkallday/one-off/one-off")
+	Expect(err).NotTo(HaveOccurred())
+
+	pathToFakeFly, err = gexec.Build("github.com/kkallday/one-off/one-off/fly")
 	Expect(err).NotTo(HaveOccurred())
 })
 

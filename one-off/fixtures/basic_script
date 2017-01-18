@@ -1,0 +1,7 @@
+#!/bin/bash -exu
+export VAR1="something"
+export VAR2="another random var"
+export VAR3="maybe a cert value"
+
+fly -t some-target-alias execute --config=REPLACE/ME/PATH/TO/TASK \
+		--inputs-from some-pipeline/some-job
