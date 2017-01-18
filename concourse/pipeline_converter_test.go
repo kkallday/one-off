@@ -51,6 +51,31 @@ jobs:
       VAR1: value1
       VAR2: value2
       VAR3: value3`
+	modernPipelineWithDoYAML = `---
+groups:
+- name: infrastructure-ci
+  jobs:
+  - infrastructure-ci-unit-tests
+resources:
+- name: infrastructure-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/infrastructure-ci
+resource_types: []
+jobs:
+- name: some-job
+  public: true
+  plan:
+  - do:
+    - get: infrastructure-ci
+      trigger: true
+    - task: some-task
+      file: infrastructure-ci/scripts/infrastructure-ci/task.yml
+    params:
+      VAR1: value1
+      VAR2: value2
+      VAR3: value3`
 )
 
 var _ = Describe("pipeline converter", func() {
@@ -76,6 +101,16 @@ export VAR3="value3"`))
 				Expect(envVars).To(Equal(`export VAR1OLD="value1old"
 export VAR2OLD="value2old"
 export VAR3OLD="value3old"`))
+			})
+		})
+
+		Context(`when given pipeline YAML contains a "do" section`, func() {
+			It("returns env vars", func() {
+				envVars, err := pc.EnvVars(modernPipelineWithDoYAML, "some-job", "some-task")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(envVars).To(Equal(`export VAR1="value1"
+export VAR2="value2"
+export VAR3="value3"`))
 			})
 		})
 

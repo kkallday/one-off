@@ -28,6 +28,11 @@ type Plan struct {
 	Task   string
 	Params map[string]interface{}
 	Config *Config
+	Do     []Do
+}
+
+type Do struct {
+	Task string
 }
 
 type Config struct {
@@ -89,6 +94,12 @@ func (PipelineConverter) findTask(job Job, taskName, jobName string) (Plan, erro
 	for _, plan := range job.Plans {
 		if plan.Task == taskName {
 			return plan, nil
+		}
+
+		for _, do := range plan.Do {
+			if do.Task == taskName {
+				return plan, nil
+			}
 		}
 	}
 
