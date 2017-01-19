@@ -11,7 +11,8 @@ var _ = Describe("fly", func() {
 	var fly concourse.Fly
 
 	BeforeEach(func() {
-		fly = concourse.NewFly(pathToFakeFly)
+		fly = concourse.NewFly()
+		fly.SetPathToFly(pathToFakeFly)
 	})
 
 	Describe("GetPipeline", func() {
@@ -25,13 +26,17 @@ var _ = Describe("fly", func() {
 
 		Context("failure cases", func() {
 			It("returns an error when fly fails to run", func() {
-				fly = concourse.NewFly("unknown-command")
+				fly = concourse.NewFly()
+				fly.SetPathToFly("unknown-command")
+
 				_, err := fly.GetPipeline("", "")
 				Expect(err).To(MatchError(`exec: "unknown-command": executable file not found in $PATH`))
 			})
 
 			It("returns an error containing stderr when fly exits with a non-zero exit code", func() {
-				fly = concourse.NewFly(pathToFakeErroredFly)
+				fly = concourse.NewFly()
+				fly.SetPathToFly(pathToFakeErroredFly)
+
 				_, err := fly.GetPipeline("", "")
 				Expect(err).To(MatchError("exit status 1\nstderr from fly: some error message"))
 			})

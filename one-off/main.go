@@ -3,24 +3,18 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/kkallday/one-off/application"
 	"github.com/kkallday/one-off/concourse"
 )
 
 func main() {
-	pathToFly, err := exec.LookPath("fly")
-	if err != nil {
-		fail(err)
-	}
-
-	fly := concourse.NewFly(pathToFly)
+	fly := concourse.NewFly()
 	pipelineConverter := concourse.NewPipelineConverter()
 	oneOff := application.NewOneOff(&fly, pipelineConverter, os.Stdout)
 
 	app := application.New(oneOff)
-	err = app.Execute(os.Args[1:])
+	err := app.Execute(os.Args[1:])
 	if err != nil {
 		fail(err)
 	}

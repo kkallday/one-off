@@ -10,10 +10,8 @@ type Fly struct {
 	pathToFly string
 }
 
-func NewFly(pathToFly string) Fly {
-	return Fly{
-		pathToFly: pathToFly,
-	}
+func NewFly() Fly {
+	return Fly{}
 }
 
 func (f Fly) GetPipeline(targetAlias, pipeline string) (string, error) {
