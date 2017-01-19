@@ -36,3 +36,7 @@ Requires: `fly` [concourse cli](https://concourse.ci/fly-cli.html)
 ```
 $ go get github.com/kkallday/one-off/one-off
 ```
+## Testing
+
+- To run tests you will need [ginkgo] (https://onsi.github.io/ginkgo) and [gomega] (https://onsi.github.io/gomega)
+- Run `ginkgo -r` or `./bin/test` to run all tests
