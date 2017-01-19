@@ -31,6 +31,9 @@ var _ = Describe("one off", func() {
 		fakePipelineConverter = &fakes.PipelineConverter{}
 		stdout = &bytes.Buffer{}
 		oneOff = application.NewOneOff(fakeFly, fakePipelineConverter, stdout)
+		application.SetLookPath(func(_ string) (string, error) {
+			return "/some/path/to/fly", nil
+		})
 	})
 
 	AfterEach(func() {
