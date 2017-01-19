@@ -1,4 +1,4 @@
-# one-off
+# one-off [![Build Status](https://travis-ci.org/kkallday/one-off.svg?branch=master)](https://travis-ci.org/kkallday/one-off)
 
 Generates a bash script to submit a local [concourse](https://www.concourse.ci) task. The bash
 script will contain all pipeline vars for a given task and generate part of the `fly execute`
